@@ -39,15 +39,26 @@ void main() {
     print(words.length);
     print(sortedWords.length);
 
-    const c = CharacterState.new;
+    // const c = CharacterState.new;
+
+    const w = CharacterState.wrong;
+    const f = CharacterState.found;
+    const s = CharacterState.somewhere;
 
     final guesses = <List<CharacterState>>[
       [
-        c('r', state: FoundState.wrong),
-        c('a', state: FoundState.wrong),
-        c('i', state: FoundState.wrong),
-        c('s', state: FoundState.wrong),
-        c('e', state: FoundState.wrong)
+        s('r'),
+        f('a'),
+        w('i'),
+        w('s'),
+        s('e'),
+      ],
+      [
+        f('c'),
+        w('l'),
+        w('o'),
+        w('u'),
+        s('t'),
       ],
     ];
     print(guesses);
@@ -99,12 +110,13 @@ void main() {
     final firstMatches = [
       ...sortedWords.where((element) => regex.hasMatch(element))
     ];
-    print('firstMatches: $firstMatches');
     if (maybes.isNotEmpty) {
       print([
         ...firstMatches
             .where((match) => maybes.every((maybe) => match.contains(maybe)))
       ]);
+    } else {
+      print('firstMatches: $firstMatches');
     }
   }
 
@@ -178,6 +190,10 @@ class CharacterState {
   FoundState state;
 
   CharacterState(this.character, {this.state = FoundState.wrong});
+
+  CharacterState.wrong(this.character) : state = FoundState.wrong;
+  CharacterState.somewhere(this.character) : state = FoundState.somewhere;
+  CharacterState.found(this.character) : state = FoundState.found;
 
   @override
   String toString() =>
