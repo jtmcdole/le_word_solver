@@ -36,10 +36,7 @@ class WordleSolver extends StatelessWidget {
         brightness: Brightness.dark,
         backgroundColor: Colors.black,
       ),
-      home: Scaffold(
-        backgroundColor: Colors.black,
-        body: MyHomePage(title: 'Wordle Solver', key: key),
-      ),
+      home: MyHomePage(title: 'Wordle Solver', key: key),
     );
   }
 }
@@ -94,94 +91,146 @@ class MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     // This trailing comma makes auto-formatting nicer for build methods.
-    final list = ListView(
-      shrinkWrap: true,
-      children: [
-        for (var row in rows)
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              for (var char in row)
-                Card(
-                  child: GestureDetector(
-                    onTap: () {
-                      if (char.state == FoundState.unknown &&
-                          char.character == '') return;
-                      setState(() {
-                        char.state = FoundState.values[
-                            ((char.state.index + 1) % FoundState.values.length)
-                                .clamp(1, FoundState.values.length)];
-                        suggestions = solve(rows);
-                      });
-                    },
-                    child: SizedBox(
-                      height: 60,
-                      width: 60,
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: colors[char.state] ?? Colors.black,
-                          border: char.state == FoundState.unknown
-                              ? Border.all(
-                                  color: Colors.grey[850]!,
-                                  width: 2,
-                                )
-                              : null,
-                        ),
-                        child: Center(
-                          child: Text(char.character),
+    final list = ListView.builder(
+        shrinkWrap: true,
+        itemCount: rows.length,
+        itemBuilder: (context, index) {
+          final row = rows[index];
+          final string = [for (var char in row) char.character].join();
+          return Dismissible(
+            key: Key(string),
+            background: Container(color: Colors.red[600]),
+            onDismissed: (_) {
+              setState(() {
+                rows.removeAt(index);
+                suggestions = solve(rows);
+
+                ScaffoldMessenger.of(context)
+                  ..removeCurrentSnackBar()
+                  ..showSnackBar(SnackBar(
+                    content: Text('Removed $string'),
+                    action: SnackBarAction(
+                      label: 'UNDO',
+                      onPressed: () {
+                        setState(() {
+                          rows.insert(index, row);
+                          suggestions = solve(rows);
+                        });
+                      },
+                    ),
+                  ));
+              });
+            },
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                for (var char in row)
+                  Card(
+                    child: GestureDetector(
+                      onTap: () {
+                        if (char.state == FoundState.unknown &&
+                            char.character == '') return;
+                        setState(() {
+                          char.state = FoundState.values[
+                              ((char.state.index + 1) %
+                                      FoundState.values.length)
+                                  .clamp(1, FoundState.values.length)];
+                          suggestions = solve(rows);
+                        });
+                      },
+                      child: SizedBox(
+                        height: 60,
+                        width: 60,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: colors[char.state] ?? Colors.black,
+                            border: char.state == FoundState.unknown
+                                ? Border.all(
+                                    color: Colors.grey[850]!,
+                                    width: 2,
+                                  )
+                                : null,
+                          ),
+                          child: Center(
+                            child: Text(char.character),
+                          ),
                         ),
                       ),
                     ),
                   ),
-                ),
-            ],
-          ),
-      ],
-    );
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        Flexible(child: list),
-        SizedBox(
-          width: 200,
-          child: TextField(
-            controller: controller,
-            autocorrect: false,
-            autofocus: false,
-            decoration: InputDecoration(
-              hintText: 'enter 5 letter words',
-              errorText: errorText,
+              ],
             ),
-            onSubmitted: (String text) {
+          );
+        });
+
+    bool showFab = rows.isNotEmpty;
+
+    return Scaffold(
+      floatingActionButton: AnimatedSlide(
+        offset: showFab ? Offset.zero : const Offset(0, 2),
+        duration: const Duration(milliseconds: 300),
+        child: AnimatedOpacity(
+          duration: const Duration(milliseconds: 300),
+          opacity: showFab ? 1 : 0,
+          child: FloatingActionButton(
+            backgroundColor: Colors.red,
+            child: const Icon(Icons.delete),
+            onPressed: () {
               setState(() {
-                if (text.length != 5) {
-                  controller.clear();
-                  errorText = 'Word must be 5 characters long';
-                  return;
-                }
-                errorText = null;
-                rows.add([
-                  CharacterState(text[0], state: FoundState.wrong),
-                  CharacterState(text[1], state: FoundState.wrong),
-                  CharacterState(text[2], state: FoundState.wrong),
-                  CharacterState(text[3], state: FoundState.wrong),
-                  CharacterState(text[4], state: FoundState.wrong),
-                ]);
-                controller.clear();
+                rows.removeLast();
                 suggestions = solve(rows);
               });
             },
           ),
         ),
-        Flexible(
-          child: ListView(
-            padding: const EdgeInsets.only(top: 10),
-            children: [
-              for (var sug in suggestions) Center(child: Text(sug)),
-            ],
+      ),
+      backgroundColor: Colors.black,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Flexible(child: list),
+          SizedBox(
+            width: 200,
+            child: TextField(
+              controller: controller,
+              autocorrect: false,
+              autofocus: false,
+              textInputAction: TextInputAction.search,
+              decoration: InputDecoration(
+                hintText: 'enter 5 letter words',
+                errorText: errorText,
+              ),
+              onSubmitted: (String text) {
+                setState(() {
+                  if (text.length != 5) {
+                    controller.clear();
+                    errorText = 'Word must be 5 characters long';
+                    return;
+                  }
+                  errorText = null;
+                  rows.add([
+                    CharacterState(text[0], state: FoundState.wrong),
+                    CharacterState(text[1], state: FoundState.wrong),
+                    CharacterState(text[2], state: FoundState.wrong),
+                    CharacterState(text[3], state: FoundState.wrong),
+                    CharacterState(text[4], state: FoundState.wrong),
+                  ]);
+                  controller.clear();
+                  suggestions = solve(rows);
+                });
+              },
+            ),
           ),
-        ),
-      ],
+          Flexible(
+            child: ListView(
+              padding: const EdgeInsets.only(top: 10),
+              children: [
+                for (var sug in suggestions) Center(child: Text(sug)),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
