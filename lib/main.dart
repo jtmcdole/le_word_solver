@@ -92,76 +92,76 @@ class MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     // This trailing comma makes auto-formatting nicer for build methods.
     final list = ListView.builder(
-        shrinkWrap: true,
-        itemCount: rows.length,
-        itemBuilder: (context, index) {
-          final row = rows[index];
-          final string = [for (var char in row) char.character].join();
-          return Dismissible(
-            key: Key(string),
-            background: Container(color: Colors.red[600]),
-            onDismissed: (_) {
-              setState(() {
-                rows.removeAt(index);
-                suggestions = solve(rows);
+      shrinkWrap: true,
+      itemCount: rows.length,
+      itemBuilder: (context, index) {
+        final row = rows[index];
+        final string = [for (var char in row) char.character].join();
+        return Dismissible(
+          key: Key(string),
+          background: Container(color: Colors.red[600]),
+          onDismissed: (_) {
+            setState(() {
+              rows.removeAt(index);
+              suggestions = solve(rows);
 
-                ScaffoldMessenger.of(context)
-                  ..removeCurrentSnackBar()
-                  ..showSnackBar(SnackBar(
-                    content: Text('Removed $string'),
-                    action: SnackBarAction(
-                      label: 'UNDO',
-                      onPressed: () {
-                        setState(() {
-                          rows.insert(index, row);
-                          suggestions = solve(rows);
-                        });
-                      },
-                    ),
-                  ));
-              });
-            },
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                for (var char in row)
-                  Card(
-                    child: GestureDetector(
-                      onTap: () {
-                        if (char.state == FoundState.unknown &&
-                            char.character == '') return;
-                        setState(() {
-                          char.state = FoundState.values[
-                              ((char.state.index + 1) %
-                                      FoundState.values.length)
-                                  .clamp(1, FoundState.values.length)];
-                          suggestions = solve(rows);
-                        });
-                      },
-                      child: SizedBox(
-                        height: 60,
-                        width: 60,
-                        child: DecoratedBox(
-                          decoration: BoxDecoration(
-                            color: colors[char.state] ?? Colors.black,
-                            border: char.state == FoundState.unknown
-                                ? Border.all(
-                                    color: Colors.grey[850]!,
-                                    width: 2,
-                                  )
-                                : null,
-                          ),
-                          child: Center(
-                            child: Text(char.character),
-                          ),
+              ScaffoldMessenger.of(context)
+                ..removeCurrentSnackBar()
+                ..showSnackBar(SnackBar(
+                  content: Text('Removed $string'),
+                  action: SnackBarAction(
+                    label: 'UNDO',
+                    onPressed: () {
+                      setState(() {
+                        rows.insert(index, row);
+                        suggestions = solve(rows);
+                      });
+                    },
+                  ),
+                ));
+            });
+          },
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var char in row)
+                Card(
+                  child: GestureDetector(
+                    onTap: () {
+                      if (char.state == FoundState.unknown &&
+                          char.character == '') return;
+                      setState(() {
+                        char.state = FoundState.values[
+                            ((char.state.index + 1) % FoundState.values.length)
+                                .clamp(1, FoundState.values.length)];
+                        suggestions = solve(rows);
+                      });
+                    },
+                    child: SizedBox(
+                      height: 60,
+                      width: 60,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: colors[char.state] ?? Colors.black,
+                          border: char.state == FoundState.unknown
+                              ? Border.all(
+                                  color: Colors.grey[850]!,
+                                  width: 2,
+                                )
+                              : null,
+                        ),
+                        child: Center(
+                          child: Text(char.character),
                         ),
                       ),
                     ),
                   ),
-              ],
-            ),
-          );
-        });
+                ),
+            ],
+          ),
+        );
+      },
+    );
 
     bool showFab = rows.isNotEmpty;
 
@@ -193,8 +193,8 @@ class MyHomePageState extends State<MyHomePage> {
             width: 200,
             child: TextField(
               controller: controller,
-              autocorrect: false,
-              autofocus: false,
+              // autocorrect: false,
+              // autofocus: false,
               textInputAction: TextInputAction.search,
               decoration: InputDecoration(
                 hintText: 'enter 5 letter words',
