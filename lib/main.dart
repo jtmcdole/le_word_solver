@@ -5,23 +5,11 @@ void main() {
   runApp(const WordleSolver());
 }
 
+final key = GlobalKey<MyHomePageState>();
+
 /// - layout: 5 selectors. text box for the word - forget rendering a keyboard
 /// - tap to toggle result
 /// - list options. under
-///
-/// should we rank options based off some frequency?
-///   - frequency overall in words
-///   - frequency of letter in position
-///
-/// filters:
-///   - letters no where - ignore at all locations
-///   - letters somewhere || letters found - options to split at a location in a ternary
-///   - found position: can only be this one letter.
-///
-/// Step 1: just build a regex
-/// Step 2: performance test
-/// Step 3: ternary.
-
 class WordleSolver extends StatelessWidget {
   const WordleSolver({Key? key}) : super(key: key);
 
@@ -31,6 +19,10 @@ class WordleSolver extends StatelessWidget {
     return MaterialApp(
       title: 'Wordle Solver',
       theme: ThemeData(
+        textTheme: const TextTheme(
+          bodyText1: TextStyle(fontSize: 16.0),
+          bodyText2: TextStyle(fontSize: 24.0),
+        ),
         // This is the theme of your application.
         //
         // Try running your application with "flutter run". You'll see the
@@ -41,8 +33,14 @@ class WordleSolver extends StatelessWidget {
         // Notice that the counter didn't reset back to zero; the application
         // is not restarted.
         primarySwatch: Colors.blue,
+        brightness: Brightness.dark,
+        backgroundColor: Colors.black,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: Scaffold(
+        backgroundColor: Colors.black,
+        body: MyHomePage(title: 'Wordle Solver', key: key),
+        floatingActionButton: FloatingActionButton(onPressed: () {}),
+      ),
     );
   }
 }
@@ -62,15 +60,129 @@ class MyHomePage extends StatefulWidget {
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MyHomePage> createState() => MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  final rows = <List<CharacterState>>[];
+class MyHomePageState extends State<MyHomePage> {
+  final rows = <List<CharacterState>>[
+    // parseGuess('r-a-i-s-e-'),
+    // parseGuess('c-l-o-u-t-'),
+    // [
+    //   CharacterState('', state: FoundState.unknown),
+    //   CharacterState('', state: FoundState.unknown),
+    //   CharacterState('', state: FoundState.unknown),
+    //   CharacterState('', state: FoundState.unknown),
+    //   CharacterState('', state: FoundState.unknown),
+    // ],
+  ];
+  List<String> suggestions = [];
+  final colors = {
+    FoundState.found: Colors.green[600],
+    FoundState.somewhere: Colors.yellow[700],
+    FoundState.wrong: Colors.grey[850],
+    FoundState.unknown: Colors.black,
+  };
+
+  @override
+  void initState() {
+    super.initState();
+    suggestions = solve(rows);
+  }
+
+  final controller = TextEditingController();
+  String? errorText;
 
   @override
   Widget build(BuildContext context) {
     // This trailing comma makes auto-formatting nicer for build methods.
-    return Container();
+    final list = ListView(
+      shrinkWrap: true,
+      children: [
+        for (var row in rows)
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              for (var char in row)
+                Card(
+                  child: GestureDetector(
+                    onTap: () {
+                      if (char.state == FoundState.unknown &&
+                          char.character == '') return;
+                      setState(() {
+                        char.state = FoundState.values[
+                            ((char.state.index + 1) % FoundState.values.length)
+                                .clamp(1, FoundState.values.length)];
+                        suggestions = solve(rows);
+                      });
+                    },
+                    child: SizedBox(
+                      height: 75,
+                      width: 75,
+                      child: DecoratedBox(
+                        decoration: BoxDecoration(
+                          color: colors[char.state] ?? Colors.black,
+                          border: char.state == FoundState.unknown
+                              ? Border.all(
+                                  color: Colors.grey[850]!,
+                                  width: 2,
+                                )
+                              : null,
+                        ),
+                        child: Center(
+                          child: Text(char.character),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+            ],
+          ),
+      ],
+    );
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        Flexible(child: list),
+        SizedBox(
+          width: 200,
+          child: TextField(
+            controller: controller,
+            autocorrect: false,
+            autofocus: false,
+            decoration: InputDecoration(
+              hintText: 'enter 5 letter words',
+              errorText: errorText,
+            ),
+            onSubmitted: (String text) {
+              setState(() {
+                if (text.length != 5) {
+                  controller.clear();
+                  errorText = 'Word must be 5 characters long';
+                  return;
+                }
+                errorText = null;
+                rows.add([
+                  CharacterState(text[0], state: FoundState.wrong),
+                  CharacterState(text[1], state: FoundState.wrong),
+                  CharacterState(text[2], state: FoundState.wrong),
+                  CharacterState(text[3], state: FoundState.wrong),
+                  CharacterState(text[4], state: FoundState.wrong),
+                ]);
+                controller.clear();
+                suggestions = solve(rows);
+              });
+            },
+          ),
+        ),
+        const Padding(padding: EdgeInsets.only(top: 15)),
+        Flexible(
+          child: ListView(
+            children: [
+              for (var sug in suggestions) Center(child: Text(sug)),
+            ],
+          ),
+        ),
+      ],
+    );
   }
 }

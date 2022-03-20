@@ -8,6 +8,24 @@ late final Map<String, int> letterFrequency = () {
   return freq;
 }();
 
+late final List<Map<String, int>> letterFrequencyPosition = () {
+  final freq = <Map<String, int>>[
+    {},
+    {},
+    {},
+    {},
+    {},
+  ];
+  for (var word in words) {
+    int i = 0;
+    for (var character in word.split('')) {
+      freq[i][character] = (freq[i][character] ?? 0) + 1;
+      i++;
+    }
+  }
+  return freq;
+}();
+
 const words = [
   "cigar",
   "rebut",

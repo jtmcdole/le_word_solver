@@ -102,7 +102,7 @@ List<String> solve(List<List<CharacterState>> guesses) {
   }
 }
 
-enum FoundState { wrong, somewhere, found }
+enum FoundState { unknown, wrong, somewhere, found }
 
 class CharacterState {
   final String character;
