@@ -193,8 +193,10 @@ class MyHomePageState extends State<MyHomePage> {
             width: 200,
             child: TextField(
               controller: controller,
-              // autocorrect: false,
-              // autofocus: false,
+              autocorrect: false,
+              enableSuggestions: false,
+              maxLength: 5,
+              autofocus: false,
               textInputAction: TextInputAction.search,
               decoration: InputDecoration(
                 hintText: 'enter 5 letter words',
