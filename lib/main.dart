@@ -39,7 +39,6 @@ class WordleSolver extends StatelessWidget {
       home: Scaffold(
         backgroundColor: Colors.black,
         body: MyHomePage(title: 'Wordle Solver', key: key),
-        floatingActionButton: FloatingActionButton(onPressed: () {}),
       ),
     );
   }
@@ -116,8 +115,8 @@ class MyHomePageState extends State<MyHomePage> {
                       });
                     },
                     child: SizedBox(
-                      height: 75,
-                      width: 75,
+                      height: 60,
+                      width: 60,
                       child: DecoratedBox(
                         decoration: BoxDecoration(
                           color: colors[char.state] ?? Colors.black,
@@ -174,9 +173,9 @@ class MyHomePageState extends State<MyHomePage> {
             },
           ),
         ),
-        const Padding(padding: EdgeInsets.only(top: 15)),
         Flexible(
           child: ListView(
+            padding: const EdgeInsets.only(top: 10),
             children: [
               for (var sug in suggestions) Center(child: Text(sug)),
             ],
