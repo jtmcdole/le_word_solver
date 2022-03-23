@@ -88,6 +88,26 @@ class MyHomePageState extends State<MyHomePage> {
   final controller = TextEditingController();
   String? errorText;
 
+  void addText(String text) {
+    setState(() {
+      if (text.length != 5) {
+        controller.clear();
+        errorText = 'Word must be 5 characters long';
+        return;
+      }
+      errorText = null;
+      rows.add([
+        CharacterState(text[0], state: FoundState.wrong),
+        CharacterState(text[1], state: FoundState.wrong),
+        CharacterState(text[2], state: FoundState.wrong),
+        CharacterState(text[3], state: FoundState.wrong),
+        CharacterState(text[4], state: FoundState.wrong),
+      ]);
+      controller.clear();
+      suggestions = solve(rows);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // This trailing comma makes auto-formatting nicer for build methods.
@@ -164,7 +184,6 @@ class MyHomePageState extends State<MyHomePage> {
     );
 
     bool showFab = rows.isNotEmpty;
-
     return Scaffold(
       floatingActionButton: AnimatedSlide(
         offset: showFab ? Offset.zero : const Offset(0, 2),
@@ -202,33 +221,26 @@ class MyHomePageState extends State<MyHomePage> {
                 hintText: 'enter 5 letter words',
                 errorText: errorText,
               ),
-              onSubmitted: (String text) {
-                setState(() {
-                  if (text.length != 5) {
-                    controller.clear();
-                    errorText = 'Word must be 5 characters long';
-                    return;
-                  }
-                  errorText = null;
-                  rows.add([
-                    CharacterState(text[0], state: FoundState.wrong),
-                    CharacterState(text[1], state: FoundState.wrong),
-                    CharacterState(text[2], state: FoundState.wrong),
-                    CharacterState(text[3], state: FoundState.wrong),
-                    CharacterState(text[4], state: FoundState.wrong),
-                  ]);
-                  controller.clear();
-                  suggestions = solve(rows);
-                });
+              onChanged: (String? text) {
+                if (text == null) return;
+                if (text.length == 5) addText(text);
               },
+              onSubmitted: addText,
             ),
           ),
           Flexible(
-            child: ListView(
+            child: ListView.builder(
               padding: const EdgeInsets.only(top: 10),
-              children: [
-                for (var sug in suggestions) Center(child: Text(sug)),
-              ],
+              itemCount: suggestions.length,
+              itemBuilder: (context, index) {
+                final suggestion = suggestions[index];
+                return InkWell(
+                  child: Center(child: Text(suggestion)),
+                  onTap: () {
+                    addText(suggestion);
+                  },
+                );
+              },
             ),
           ),
         ],
