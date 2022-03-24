@@ -96,13 +96,34 @@ class MyHomePageState extends State<MyHomePage> {
         return;
       }
       errorText = null;
-      rows.add([
-        CharacterState(text[0], state: FoundState.wrong),
-        CharacterState(text[1], state: FoundState.wrong),
-        CharacterState(text[2], state: FoundState.wrong),
-        CharacterState(text[3], state: FoundState.wrong),
-        CharacterState(text[4], state: FoundState.wrong),
-      ]);
+      final newCharacters = <CharacterState>[];
+      for (int i = 0; i < 5; i++) {
+        // look for "founds" and "maybes". "Maybes" can be anywhere, but founds
+        // outrank.
+        var state = FoundState.wrong;
+        final maybes = <String>{};
+
+        for (var row in rows) {
+          for (var char in row) {
+            if (char.state == FoundState.somewhere) {
+              maybes.add(char.character);
+            }
+          }
+        }
+
+        for (var row in rows) {
+          if (text[i] == row[i].character && row[i].state == FoundState.found) {
+            state = FoundState.found;
+            break;
+          }
+        }
+        if (state != FoundState.found && maybes.contains(text[i])) {
+          state = FoundState.somewhere;
+        }
+
+        newCharacters.add(CharacterState(text[i], state: state));
+      }
+      rows.add(newCharacters);
       controller.clear();
       suggestions = solve(rows);
     });
@@ -183,26 +204,7 @@ class MyHomePageState extends State<MyHomePage> {
       },
     );
 
-    bool showFab = rows.isNotEmpty;
     return Scaffold(
-      floatingActionButton: AnimatedSlide(
-        offset: showFab ? Offset.zero : const Offset(0, 2),
-        duration: const Duration(milliseconds: 300),
-        child: AnimatedOpacity(
-          duration: const Duration(milliseconds: 300),
-          opacity: showFab ? 1 : 0,
-          child: FloatingActionButton(
-            backgroundColor: Colors.red,
-            child: const Icon(Icons.delete),
-            onPressed: () {
-              setState(() {
-                rows.removeLast();
-                suggestions = solve(rows);
-              });
-            },
-          ),
-        ),
-      ),
       backgroundColor: Colors.black,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
