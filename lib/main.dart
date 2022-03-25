@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wordle_solver/algorithm.dart';
+import 'package:wordle_solver/words.dart';
 
 void main() {
   runApp(const WordleSolver());
@@ -207,8 +208,9 @@ class MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       backgroundColor: Colors.black,
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.start,
         children: [
+          const Padding(padding: EdgeInsets.only(top: 50)),
           Flexible(child: list),
           SizedBox(
             width: 200,
@@ -232,6 +234,8 @@ class MyHomePageState extends State<MyHomePage> {
           ),
           Flexible(
             child: ListView.builder(
+              shrinkWrap: true,
+              primary: false, // scroll controller attached multiple times?
               padding: const EdgeInsets.only(top: 10),
               itemCount: suggestions.length,
               itemBuilder: (context, index) {
@@ -243,6 +247,19 @@ class MyHomePageState extends State<MyHomePage> {
                   },
                 );
               },
+            ),
+          ),
+          SizedBox(
+            width: 200,
+            child: Align(
+              alignment: Alignment.centerRight,
+              child: Text(
+                '${suggestions.length}/${words.length}',
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[500],
+                ),
+              ),
             ),
           ),
         ],
