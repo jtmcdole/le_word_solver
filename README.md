@@ -1,4 +1,4 @@
-# le_wordle_solver
+# le_word_solver
 
 This is a demonstration flutter application. It uses frequency scores to
 generate good first and second guesses with a large spread of characters

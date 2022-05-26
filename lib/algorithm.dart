@@ -1,4 +1,4 @@
-import 'package:wordle_solver/words.dart';
+import 'package:le_word_solver/words.dart';
 
 /// Generate a score based on the letter frequency inside of it, counting each
 /// letter only once unless [unique] is false.

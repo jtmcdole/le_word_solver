@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:wordle_solver/algorithm.dart';
-import 'package:wordle_solver/words.dart';
+import 'package:le_word_solver/algorithm.dart';
+import 'package:le_word_solver/words.dart';
 
 void main() {
-  runApp(const WordleSolver());
+  runApp(const LeWordSolver());
 }
 
 final key = GlobalKey<MyHomePageState>();
@@ -11,14 +11,14 @@ final key = GlobalKey<MyHomePageState>();
 /// - layout: 5 selectors. text box for the word - forget rendering a keyboard
 /// - tap to toggle result
 /// - list options. under
-class WordleSolver extends StatelessWidget {
-  const WordleSolver({Key? key}) : super(key: key);
+class LeWordSolver extends StatelessWidget {
+  const LeWordSolver({Key? key}) : super(key: key);
 
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Wordle Solver',
+      title: 'le\'Word Solver',
       theme: ThemeData(
         textTheme: const TextTheme(
           bodyText1: TextStyle(fontSize: 16.0),
@@ -37,7 +37,7 @@ class WordleSolver extends StatelessWidget {
         brightness: Brightness.dark,
         backgroundColor: Colors.black,
       ),
-      home: MyHomePage(title: 'Wordle Solver', key: key),
+      home: MyHomePage(title: 'le\'Word Solver', key: key),
     );
   }
 }

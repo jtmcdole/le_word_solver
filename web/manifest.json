@@ -1,6 +1,6 @@
 {
-    "name": "wordle_solver",
-    "short_name": "wordle_solver",
+    "name": "le_word_solver",
+    "short_name": "le_word_solver",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

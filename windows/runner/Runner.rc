@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.example" "\0"
-            VALUE "FileDescription", "wordle_solver" "\0"
+            VALUE "FileDescription", "le_word_solver" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "wordle_solver" "\0"
+            VALUE "InternalName", "le_word_solver" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2022 com.example. All rights reserved." "\0"
-            VALUE "OriginalFilename", "wordle_solver.exe" "\0"
-            VALUE "ProductName", "wordle_solver" "\0"
+            VALUE "OriginalFilename", "le_word_solver.exe" "\0"
+            VALUE "ProductName", "le_word_solver" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
