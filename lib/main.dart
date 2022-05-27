@@ -220,15 +220,11 @@ class MyHomePageState extends State<MyHomePage> {
               enableSuggestions: false,
               maxLength: 5,
               autofocus: false,
-              textInputAction: TextInputAction.search,
+              textInputAction: TextInputAction.done,
               decoration: InputDecoration(
                 hintText: 'enter 5 letter words',
                 errorText: errorText,
               ),
-              onChanged: (String? text) {
-                if (text == null) return;
-                if (text.length == 5) addText(text);
-              },
               onSubmitted: addText,
             ),
           ),
